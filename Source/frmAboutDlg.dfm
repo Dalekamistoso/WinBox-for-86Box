@@ -9,12 +9,13 @@ object AboutDlg: TAboutDlg
   ClientWidth = 358
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
+  Font.Color = clBlack
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   ParentBiDiMode = False
   Position = poMainFormCenter
+  StyleElements = [seBorder]
   OnCreate = FormCreate
   PixelsPerInch = 96
   DesignSize = (
@@ -31,7 +32,7 @@ object AboutDlg: TAboutDlg
   object lbTitle: TLabel
     Left = 0
     Top = 145
-    Width = 358
+    Width = 356
     Height = 19
     Alignment = taCenter
     Anchors = [akLeft, akTop, akRight]
@@ -45,6 +46,7 @@ object AboutDlg: TAboutDlg
     Font.Style = [fsBold]
     ParentBiDiMode = False
     ParentFont = False
+    ExplicitWidth = 358
   end
   object lbVersion: TLabel
     Left = 24
@@ -59,6 +61,7 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
+    StyleElements = []
   end
   object lbDeveloper: TLabel
     Left = 24
@@ -73,6 +76,7 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
+    StyleElements = []
   end
   object lbDeveloperInfo: TLabel
     Left = 94
@@ -81,6 +85,7 @@ object AboutDlg: TAboutDlg
     Height = 20
     AutoSize = False
     Caption = 'Laci b'#225#39', 2020-2021'
+    StyleElements = []
   end
   object lbTranslator: TLabel
     Left = 24
@@ -95,6 +100,7 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
+    StyleElements = []
   end
   object lbTranslatorInfo: TLabel
     Left = 94
@@ -103,9 +109,10 @@ object AboutDlg: TAboutDlg
     Height = 20
     AutoSize = False
     Caption = 'Ez a program alapnyelve.'
+    StyleElements = []
   end
   object lbWebApplication: TLabel
-    Left = 291
+    Left = 289
     Top = 176
     Width = 60
     Height = 20
@@ -120,10 +127,12 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ParentFont = False
+    StyleElements = []
     OnClick = lbWebApplicationClick
+    ExplicitLeft = 291
   end
   object lbWebDeveloper: TLabel
-    Left = 291
+    Left = 289
     Top = 195
     Width = 60
     Height = 20
@@ -138,7 +147,9 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ParentFont = False
+    StyleElements = []
     OnClick = lbWebApplicationClick
+    ExplicitLeft = 291
   end
   object lbConnProjects: TLabel
     Left = 24
@@ -153,6 +164,7 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
+    StyleElements = []
   end
   object lb86Box: TLabel
     Left = 157
@@ -161,6 +173,7 @@ object AboutDlg: TAboutDlg
     Height = 20
     AutoSize = False
     Caption = '86Box, x86 emul'#225'tor'
+    StyleElements = []
   end
   object lbUsedProjects: TLabel
     Left = 24
@@ -175,9 +188,10 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
+    StyleElements = []
   end
   object lbWeb86Box: TLabel
-    Left = 291
+    Left = 289
     Top = 240
     Width = 60
     Height = 20
@@ -192,7 +206,9 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ParentFont = False
+    StyleElements = []
     OnClick = lbWebApplicationClick
+    ExplicitLeft = 291
   end
   object lbJCL: TLabel
     Left = 157
@@ -201,9 +217,10 @@ object AboutDlg: TAboutDlg
     Height = 20
     AutoSize = False
     Caption = 'JEDI Code Library (JCL)'
+    StyleElements = []
   end
   object lbWebJCL: TLabel
-    Left = 291
+    Left = 289
     Top = 259
     Width = 60
     Height = 20
@@ -218,17 +235,21 @@ object AboutDlg: TAboutDlg
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ParentFont = False
+    StyleElements = []
     OnClick = lbWebApplicationClick
+    ExplicitLeft = 291
   end
   object lbLicensing: TLabel
     Left = 0
     Top = 287
-    Width = 358
+    Width = 356
     Height = 20
     Alignment = taCenter
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 'A program szabad szoftver GNU GPL v3 alatt.'
+    StyleElements = []
+    ExplicitWidth = 358
   end
   object edVersion: TEdit
     Left = 94
@@ -237,9 +258,11 @@ object AboutDlg: TAboutDlg
     Height = 20
     AutoSize = False
     BorderStyle = bsNone
+    Color = clWhite
     ReadOnly = True
     TabOrder = 0
     Text = 'edVersion'
+    StyleElements = []
   end
   object btnOK: TButton
     Left = 260
@@ -250,5 +273,6 @@ object AboutDlg: TAboutDlg
     Caption = '&OK'
     ModalResult = 1
     TabOrder = 1
+    ExplicitTop = 309
   end
 end

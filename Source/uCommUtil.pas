@@ -143,7 +143,7 @@ procedure InvariantBiDiLayout(const DC: HDC); inline;
 
 implementation
 
-uses ComObj, ShlObj, ActiveX, FileCtrl, uCommText, uLang;
+uses ComObj, ShlObj, ActiveX, FileCtrl, uCommText, uLang, Themes;
 
 resourcestring
   InfWinBox = 'WinBox.inf';

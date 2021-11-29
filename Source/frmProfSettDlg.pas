@@ -109,7 +109,7 @@ implementation
 
 {$R *.dfm}
 
-uses uCommUtil, uCommText, frmMainForm;
+uses uCommUtil, uCommText, frmMainForm, Themes;
 
 resourcestring
   AskVmIconDel = '.AskVmIconDel';
@@ -270,6 +270,13 @@ begin
         rcColor.Brush.Color := Color;
         rcColor.Brush.Style := bsSolid;
       end;
+
+      rcColor.Enabled := StyleServices.IsSystemStyle;
+      if (not rcColor.Enabled) and (rcColor.Brush.Style <> bsClear) then
+        rcColor.Brush.Style := bsDiagCross;
+
+      bvColor.Enabled := rcColor.Enabled;
+      btnResetColor.Enabled := rcColor.Enabled;
     end;
 end;
 

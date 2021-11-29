@@ -29,7 +29,7 @@ uses
   ComCtrls, VCLTee.TeEngine, VCLTee.TeeProcs, VCLTee.Chart, VCLTee.Series,
   BaseImageCollection, ImageCollection, ImageList, ImgList, VirtualImageList,
   GraphUtil, Generics.Collections, u86Box, Vcl.ToolWin, uLang, AppEvnts, frm86Box,
-  Vcl.ExtDlgs, frmUpdaterDlg;
+  Vcl.ExtDlgs, VCLTee.TeCanvas, frmUpdaterDlg;
 
 type
   TListBox = class(StdCtrls.TListBox)
@@ -387,12 +387,15 @@ type
     clDisabled1, clDisabled2: TColor;
 
     SideRatio: single;
+    IsSystemStyle: boolean;
 
     procedure ResetChart(Chart: TChart);
     procedure AddSeries(Chart: TChart; AColor: TColor; const FriendlyName: string);
     procedure AddValue(ASeries: TFastLineSeries; const Value: extended);
 
+  protected
     procedure WMEnterSizeMove(var Message: TMessage); message WM_ENTERSIZEMOVE;
+    procedure CMStyleChanged(var Msg: TMessage); message CM_STYLECHANGED;
   public
     IsAllStopped,
     IsAnyRunning,          //not IsAllStopped
@@ -439,7 +442,7 @@ uses JclDebug, uProcessMon, uProcProfile, uCommUtil, frmProgSettDlg,
   frmProfSettDlg, frmImportVM, uWinProfile, uConfigMgr, ShellAPI,
   uCommText, Rtti, frmErrorDialog, frmAboutDlg, frmSelectHDD, frmNewFloppy,
   frmWizardHDD, frmWizardVM, uBaseProfile, frmSplash, dmWinBoxUpd,
-  WinCodec;
+  WinCodec, Themes;
 
 const
   MaxPoints = 60;
@@ -872,6 +875,7 @@ begin
           //-1:  Enabled := State = PROFILE_STATE_STOPPED;
           -2:  Enabled := State = PROFILE_STATE_RUNNING;
           -6:  Enabled := State <> 0;
+          -7, -8: Enabled := IsSystemStyle;
           -127: Enabled := State = 0;
           else if Tag >= 0 then
             Enabled := CanState(Tag)
@@ -1017,6 +1021,52 @@ begin
       (Screen.Forms[I] as ILanguageSupport).Translate;
 
   ChangeBiDi(NewBiDi);
+end;
+
+procedure TWinBoxMain.CMStyleChanged(var Msg: TMessage);
+var
+  H, L, S: word;
+  BkColor, TextColor, TitleColor: TColor;
+const
+  TitleColors: array [boolean] of TColor = (clHighlight, clBlue);
+
+  procedure ProcessChart(Chart: TChart);
+  begin
+    with Chart do begin
+      Color := BkColor;
+      Legend.Color := BkColor;
+
+      Frame.Color := TextColor;
+      Legend.Font.Color := TextColor;
+      Legend.Frame.Color := TextColor;
+      LeftAxis.LabelsFont.Color := TextColor;
+      BottomAxis.LabelsFont.Color := TextColor;
+      LeftAxis.Title.Font.Color := TextColor;
+      BottomAxis.Title.Font.Color := TextColor;
+
+      Title.Font.Color := TitleColor;
+    end;
+  end;
+
+begin
+  IsSystemStyle := StyleServices.IsSystemStyle;
+
+  clHighlight1 := StyleSysColor(clHighlight);
+  ColorRGBToHLS(clHighlight1, H, L, S);
+  clDisabled1 := ColorHLSToRGB(H, L, 0);
+
+  L := L * 10 div 8;
+  clHighlight2 := ColorHLSToRGB(H, L, S);
+  clDisabled2 := ColorHLSToRGB(H, L, 0);
+
+  BkColor := StyleSysColor(clWindow);
+  TextColor := StyleSysColor(clWindowText);
+
+  TitleColor := TitleColors[IsSystemStyle];
+
+  ProcessChart(ChartCPU);
+  ProcessChart(ChartRAM);
+  ProcessChart(ChartVMs);
 end;
 
 procedure TWinBoxMain.DeleteVM(DeleteFiles: boolean);
@@ -1186,7 +1236,6 @@ end;
 
 procedure TWinBoxMain.FormCreate(Sender: TObject);
 var
-  H, L, S: word;
   I: integer;
 begin
   //GUI part
@@ -1198,13 +1247,7 @@ begin
   HalfCharHeight := Canvas.TextHeight('W');
   BorderThickness := (List.ItemHeight - ListImages.Height) div 2;
 
-  clHighlight1 := ColorToRGB(clHighlight);
-  ColorRGBToHLS(clHighlight1, H, L, S);
-  clDisabled1 := ColorHLSToRGB(H, L, 0);
-
-  L := L * 10 div 8;
-  clHighlight2 := ColorHLSToRGB(H, L, S);
-  clDisabled2 := ColorHLSToRGB(H, L, 0);
+  Perform(CM_STYLECHANGED, 0, 0);
 
   for I := 0 to Pages.PageCount - 1 do
     Pages.Pages[I].TabVisible := false;
@@ -1357,18 +1400,18 @@ begin
   try
     with Control as TListBox, Canvas do begin
       if Enabled and (odSelected in State) then begin
-        Brush.Color := clHighlight;
-        Font.Color := clHighlightText;
+        Brush.Color := StyleSysColor(clHighlight);
+        Font.Color := StyleSysColor(clHighlightText);
         GradientFillCanvas(Canvas, clHighlight2, clHighlight1, Rect, gdVertical);
       end
       else if (odSelected in State) then begin
-        Brush.Color := cl3DDkShadow;
-        Font.Color := cl3DLight;
+        Brush.Color := StyleSysColor(cl3DDkShadow);
+        Font.Color := StyleSysColor(cl3DLight);
         GradientFillCanvas(Canvas, clDisabled2, clDisabled1, Rect, gdVertical);
       end
       else begin
-        Brush.Color := clWindow;
-        Font.Color := clWindowText;
+        Brush.Color := StyleSysColor(clWindow);
+        Font.Color := StyleSysColor(clWindowText);
         FillRect(Rect);
       end;
 

@@ -20,7 +20,7 @@ object ProfSettDlg: TProfSettDlg
     516)
   TextHeight = 13
   object btnCancel: TButton
-    Left = 357
+    Left = 353
     Top = 478
     Width = 75
     Height = 25
@@ -28,9 +28,11 @@ object ProfSettDlg: TProfSettDlg
     Caption = '&M'#233'gse'
     ModalResult = 2
     TabOrder = 2
+    ExplicitLeft = 349
+    ExplicitTop = 477
   end
   object btnOK: TButton
-    Left = 276
+    Left = 272
     Top = 478
     Width = 75
     Height = 25
@@ -38,19 +40,23 @@ object ProfSettDlg: TProfSettDlg
     Caption = '&OK'
     TabOrder = 1
     OnClick = btnOKClick
+    ExplicitLeft = 268
+    ExplicitTop = 477
   end
   object pcPages: TPageControl
     Left = 8
     Top = 8
-    Width = 444
+    Width = 440
     Height = 458
     ActivePage = tabEmulator
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitWidth = 436
+    ExplicitHeight = 457
     object tabGeneral: TTabSheet
       Caption = #193'ltal'#225'nos'
       DesignSize = (
-        436
+        432
         430)
       object grpInformations: TGroupBox
         Left = 14
@@ -131,13 +137,13 @@ object ProfSettDlg: TProfSettDlg
       object grpBasicInfo: TGroupBox
         Left = 14
         Top = 19
-        Width = 406
+        Width = 402
         Height = 134
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Alapadatok'
         TabOrder = 0
         DesignSize = (
-          406
+          402
           134)
         object bvIcon: TBevel
           Left = 30
@@ -178,22 +184,24 @@ object ProfSettDlg: TProfSettDlg
         object edFriendlyName: TEdit
           Left = 160
           Top = 23
-          Width = 225
+          Width = 221
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
           TabOrder = 0
+          ExplicitWidth = 225
         end
         object mmDescription: TMemo
           Left = 160
           Top = 59
-          Width = 225
+          Width = 221
           Height = 54
           Anchors = [akLeft, akTop, akRight, akBottom]
           ScrollBars = ssVertical
           TabOrder = 1
           WantReturns = False
+          ExplicitWidth = 225
         end
         object btnDelete: TButton
           Tag = 7
@@ -265,18 +273,19 @@ object ProfSettDlg: TProfSettDlg
       Caption = 'Emul'#225'tor'
       ImageIndex = 3
       DesignSize = (
-        436
+        432
         430)
       object grpEmulator: TGroupBox
         Left = 18
         Top = 16
-        Width = 402
+        Width = 398
         Height = 241
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Emul'#225'tor'
         TabOrder = 0
+        ExplicitWidth = 394
         DesignSize = (
-          402
+          398
           241)
         object imgEmulator: TImage
           Left = 16
@@ -325,7 +334,7 @@ object ProfSettDlg: TProfSettDlg
         object mmOptionalParams: TMemo
           Left = 24
           Top = 175
-          Width = 353
+          Width = 349
           Height = 50
           Anchors = [akLeft, akTop, akRight, akBottom]
           BiDiMode = bdLeftToRight
@@ -333,6 +342,7 @@ object ProfSettDlg: TProfSettDlg
           ScrollBars = ssVertical
           TabOrder = 4
           WantReturns = False
+          ExplicitWidth = 345
         end
         object ed86Box: TEdit
           Left = 24
