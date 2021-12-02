@@ -168,7 +168,6 @@ resourcestring
 
 {$R *.dfm}
 
-
 procedure StyleFixHiddenEdits(Control: TWinControl;
   const AllLevels, ToSystemStyle: boolean);
 var
@@ -187,7 +186,9 @@ begin
             end
             else begin
               Color := StyleSysColor(clBtnFace);
-              Font.Color := StyleSysColor(clWindowText);
+              Font.Color :=
+                TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+              //StyleSysColor(clWindowText);
             end;
           end;
 
@@ -246,8 +247,24 @@ begin
 end;
 
 procedure TFrame86Box.CMStyleChanged(var Msg: TMessage);
+var
+  IsSystemStyle: boolean;
 begin
-  StyleFixHiddenEdits(cgPanels, true, StyleServices.IsSystemStyle);
+  IsSystemStyle := StyleServices.IsSystemStyle;
+  StyleFixHiddenEdits(cgPanels, true, IsSystemStyle);
+
+  if IsSystemStyle then begin
+    Color := clWindow;
+    Font.Color := clWindowText;
+  end
+  else begin
+    Color := StyleSysColor(clBtnFace);
+    Font.Color :=
+      TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+  end;
+
+  edState.ParentColor := true;
+  edState.Font.Color := Font.Color;
 end;
 
 constructor TFrame86Box.Create(AOwner: TComponent);

@@ -339,6 +339,7 @@ type
     MissingDiskDlg: TTaskDialog;
     acWinBoxUpdate: TAction;
     Programfrisstsekkeresse1: TMenuItem;
+    ComboBox1: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure acDebugExecute(Sender: TObject);
@@ -379,6 +380,8 @@ type
       AHeight: Integer; out ABitmap: TBitmap);
     procedure ImageCollectionDrawBiDi(ASourceImage: TWICImage; ACanvas: TCanvas;
       ARect: TRect; AProportional: Boolean);
+    procedure FormActivate(Sender: TObject);
+    procedure ComboBox1Change(Sender: TObject);
   private
     //Lista kirajzolásához szükséges cuccok
     HalfCharHeight, BorderThickness: integer;
@@ -1059,14 +1062,27 @@ begin
   clHighlight2 := ColorHLSToRGB(H, L, S);
   clDisabled2 := ColorHLSToRGB(H, L, 0);
 
-  BkColor := StyleSysColor(clWindow);
-  TextColor := StyleSysColor(clWindowText);
+  if IsSystemStyle then begin
+    BkColor := StyleSysColor(clWindow);
+    TextColor := StyleSysColor(clWindowText);
+  end
+  else begin
+    BkColor := StyleSysColor(clBtnFace);
+    TextColor :=
+      TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+
+  end;
 
   TitleColor := TitleColors[IsSystemStyle];
 
   ProcessChart(ChartCPU);
   ProcessChart(ChartRAM);
   ProcessChart(ChartVMs);
+end;
+
+procedure TWinBoxMain.ComboBox1Change(Sender: TObject);
+begin
+  TStyleManager.TrySetStyle(ComboBox1.Items[ComboBox1.ItemIndex]);
 end;
 
 procedure TWinBoxMain.DeleteVM(DeleteFiles: boolean);
@@ -1223,6 +1239,23 @@ begin
   SetCommCtrlBiDi(tbVMs.Handle, LocaleIsBiDi);
 
   Frame86Box.FlipBiDi;
+end;
+
+procedure TWinBoxMain.FormActivate(Sender: TObject);
+var
+  s: String;
+begin
+  ComboBox1.Items.BeginUpdate;
+  try
+    ComboBox1.Items.Clear;
+    for s in TStyleManager.StyleNames do
+       ComboBox1.Items.Add(s);
+    ComboBox1.Sorted := True;
+    // Select the style that's currently in use in the combobox
+    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(TStyleManager.ActiveStyle.Name);
+  finally
+    ComboBox1.Items.EndUpdate;
+  end;
 end;
 
 procedure TWinBoxMain.FormClose(Sender: TObject; var Action: TCloseAction);

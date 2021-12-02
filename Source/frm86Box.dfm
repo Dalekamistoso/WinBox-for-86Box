@@ -4,7 +4,7 @@ object Frame86Box: TFrame86Box
   Width = 526
   Height = 357
   DoubleBuffered = False
-  Color = clWindow
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -58,7 +58,7 @@ object Frame86Box: TFrame86Box
     ExplicitHeight = 276
   end
   object edState: TEdit
-    Left = 64
+    Left = 74
     Top = 330
     Width = 185
     Height = 24
@@ -76,6 +76,7 @@ object Frame86Box: TFrame86Box
     ReadOnly = True
     TabOrder = 4
     Text = 'Ismeretlen'
+    StyleElements = [seBorder]
   end
   object cgPanels: TCategoryPanelGroup
     AlignWithMargins = True
