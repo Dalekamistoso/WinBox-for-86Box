@@ -1013,7 +1013,9 @@ begin
   else begin
     Locale := NewLoc;
 
-    Language.Free;
+    if Assigned(Language) then
+      Language.Free;
+
     Language := NewLang;
   end;
 
@@ -1301,7 +1303,10 @@ begin
   end;
 
   Locale := '-'; //cseréljük ki az alapérték '' nyelvet akármire
-  ChangeLanguage(Config.ProgramLang); //azért hogy ez végigfusson
+  if LocaleOverride = '' then
+    ChangeLanguage(Config.ProgramLang) //azért hogy ez végigfusson
+  else
+    ChangeLanguage(LocaleOverride);
 
   tbVMs.ShowCaptions := true;
   tbGlobal.ShowCaptions := true;
