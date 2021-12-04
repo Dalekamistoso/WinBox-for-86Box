@@ -29,7 +29,7 @@ uses
   ComCtrls, VCLTee.TeEngine, VCLTee.TeeProcs, VCLTee.Chart, VCLTee.Series,
   BaseImageCollection, ImageCollection, ImageList, ImgList, VirtualImageList,
   GraphUtil, Generics.Collections, u86Box, Vcl.ToolWin, uLang, AppEvnts, frm86Box,
-  Vcl.ExtDlgs, frmUpdaterDlg;
+  Vcl.ExtDlgs, VCLTee.TeCanvas, frmUpdaterDlg;
 
 type
   TListBox = class(StdCtrls.TListBox)
@@ -339,6 +339,8 @@ type
     MissingDiskDlg: TTaskDialog;
     acWinBoxUpdate: TAction;
     Programfrisstsekkeresse1: TMenuItem;
+    ComboBox1: TComboBox;
+    pnTop: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure acDebugExecute(Sender: TObject);
@@ -379,6 +381,8 @@ type
       AHeight: Integer; out ABitmap: TBitmap);
     procedure ImageCollectionDrawBiDi(ASourceImage: TWICImage; ACanvas: TCanvas;
       ARect: TRect; AProportional: Boolean);
+    procedure FormActivate(Sender: TObject);
+    procedure ComboBox1Change(Sender: TObject);
   private
     //Lista kirajzolásához szükséges cuccok
     HalfCharHeight, BorderThickness: integer;
@@ -387,12 +391,15 @@ type
     clDisabled1, clDisabled2: TColor;
 
     SideRatio: single;
+    IsSystemStyle, IsColorsAllowed: boolean;
 
     procedure ResetChart(Chart: TChart);
     procedure AddSeries(Chart: TChart; AColor: TColor; const FriendlyName: string);
     procedure AddValue(ASeries: TFastLineSeries; const Value: extended);
 
+  protected
     procedure WMEnterSizeMove(var Message: TMessage); message WM_ENTERSIZEMOVE;
+    procedure CMStyleChanged(var Msg: TMessage); message CM_STYLECHANGED;
   public
     IsAllStopped,
     IsAnyRunning,          //not IsAllStopped
@@ -439,7 +446,7 @@ uses JclDebug, uProcessMon, uProcProfile, uCommUtil, frmProgSettDlg,
   frmProfSettDlg, frmImportVM, uWinProfile, uConfigMgr, ShellAPI,
   uCommText, Rtti, frmErrorDialog, frmAboutDlg, frmSelectHDD, frmNewFloppy,
   frmWizardHDD, frmWizardVM, uBaseProfile, frmSplash, dmWinBoxUpd,
-  WinCodec;
+  WinCodec, Themes;
 
 const
   MaxPoints = 60;
@@ -872,6 +879,7 @@ begin
           //-1:  Enabled := State = PROFILE_STATE_STOPPED;
           -2:  Enabled := State = PROFILE_STATE_RUNNING;
           -6:  Enabled := State <> 0;
+          -7, -8: Enabled := IsColorsAllowed;
           -127: Enabled := State = 0;
           else if Tag >= 0 then
             Enabled := CanState(Tag)
@@ -1021,6 +1029,66 @@ begin
   ChangeBiDi(NewBiDi);
 end;
 
+procedure TWinBoxMain.CMStyleChanged(var Msg: TMessage);
+var
+  H, L, S: word;
+  BkColor, TextColor, TitleColor: TColor;
+const
+  TitleColors: array [boolean] of TColor = (clHighlight, clBlue);
+
+  procedure ProcessChart(Chart: TChart);
+  begin
+    with Chart do begin
+      Color := BkColor;
+      Legend.Color := BkColor;
+
+      Frame.Color := TextColor;
+      Legend.Font.Color := TextColor;
+      Legend.Frame.Color := TextColor;
+      LeftAxis.LabelsFont.Color := TextColor;
+      BottomAxis.LabelsFont.Color := TextColor;
+      LeftAxis.Title.Font.Color := TextColor;
+      BottomAxis.Title.Font.Color := TextColor;
+
+      Title.Font.Color := TitleColor;
+    end;
+  end;
+
+begin
+  IsSystemStyle := StyleServices.IsSystemStyle;
+  IsColorsAllowed := GetColorsAllowed;
+
+  clHighlight1 := StyleSysColor(clHighlight);
+  ColorRGBToHLS(clHighlight1, H, L, S);
+  clDisabled1 := ColorHLSToRGB(H, L, 0);
+
+  L := L * 10 div 8;
+  clHighlight2 := ColorHLSToRGB(H, L, S);
+  clDisabled2 := ColorHLSToRGB(H, L, 0);
+
+  if IsSystemStyle then begin
+    BkColor := StyleSysColor(clWindow);
+    TextColor := StyleSysColor(clWindowText);
+  end
+  else begin
+    BkColor := StyleSysColor(clBtnFace);
+    TextColor :=
+      TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+
+  end;
+
+  TitleColor := TitleColors[IsSystemStyle];
+
+  ProcessChart(ChartCPU);
+  ProcessChart(ChartRAM);
+  ProcessChart(ChartVMs);
+end;
+
+procedure TWinBoxMain.ComboBox1Change(Sender: TObject);
+begin
+  TStyleManager.TrySetStyle(ComboBox1.Items[ComboBox1.ItemIndex]);
+end;
+
 procedure TWinBoxMain.DeleteVM(DeleteFiles: boolean);
 var
   FItemIndex: integer;
@@ -1122,8 +1190,32 @@ begin
 end;
 
 procedure TWinBoxMain.FlipBiDi;
+
+  procedure ReorderMenu(const Menu: TMenuItem);
+  var
+    I: Integer;
+  begin
+    for I := 0 to Menu.Count - 1 do
+      Menu.Items[I].MenuIndex := -1;
+
+    for I := 0 to Menu.Count - 1 do
+      Menu.Items[I].MenuIndex := Menu.Count - (I + 1);
+  end;
+
 begin
-  SetCommCtrlBiDi(Handle, LocaleIsBiDi);
+  if IsSystemStyle then begin
+    SetCommCtrlBiDi(Handle, LocaleIsBiDi);
+    Tag := 0;
+  end
+  else if LocaleIsBiDi then begin
+    FlipChildren(false);
+    Tag := 1;
+
+    MainMenu.BiDiMode := bdRightToLeft;
+    ReorderMenu(MainMenu.Items);
+  end;
+
+  SetCommCtrlBiDi(pnTop.Handle, LocaleIsBiDi, true);
 
   HomeMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
   PerfMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
@@ -1164,17 +1256,34 @@ begin
     DeleteDialog.Flags := DeleteDialog.Flags - [tfRtlLayout];
   end;
 
-  SetCommCtrlBiDi(tabHome.Handle, LocaleIsBiDi);
+  SetCommCtrlBiDi(tabHome.Handle, LocaleIsBiDi, true);
   SetCommCtrlBiDi(tabPerfMon.Handle, LocaleIsBiDi);
 
   SetCommCtrlBiDi(tabCPU.Handle, false);
   SetCommCtrlBiDi(tabRAM.Handle, false);
   SetCommCtrlBiDi(tabVMs.Handle, false);
 
-  SetCommCtrlBiDi(tbGlobal.Handle, LocaleIsBiDi);
-  SetCommCtrlBiDi(tbVMs.Handle, LocaleIsBiDi);
+  SetCommCtrlBiDi(tbGlobal.Handle, LocaleIsBiDi, true);
+  SetCommCtrlBiDi(tbVMs.Handle, LocaleIsBiDi, true);
 
   Frame86Box.FlipBiDi;
+end;
+
+procedure TWinBoxMain.FormActivate(Sender: TObject);
+var
+  s: String;
+begin
+  ComboBox1.Items.BeginUpdate;
+  try
+    ComboBox1.Items.Clear;
+    for s in TStyleManager.StyleNames do
+       ComboBox1.Items.Add(s);
+    ComboBox1.Sorted := True;
+    // Select the style that's currently in use in the combobox
+    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(TStyleManager.ActiveStyle.Name);
+  finally
+    ComboBox1.Items.EndUpdate;
+  end;
 end;
 
 procedure TWinBoxMain.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1188,7 +1297,6 @@ end;
 
 procedure TWinBoxMain.FormCreate(Sender: TObject);
 var
-  H, L, S: word;
   I: integer;
 begin
   //GUI part
@@ -1200,13 +1308,7 @@ begin
   HalfCharHeight := Canvas.TextHeight('W');
   BorderThickness := (List.ItemHeight - ListImages.Height) div 2;
 
-  clHighlight1 := ColorToRGB(clHighlight);
-  ColorRGBToHLS(clHighlight1, H, L, S);
-  clDisabled1 := ColorHLSToRGB(H, L, 0);
-
-  L := L * 10 div 8;
-  clHighlight2 := ColorHLSToRGB(H, L, S);
-  clDisabled2 := ColorHLSToRGB(H, L, 0);
+  Perform(CM_STYLECHANGED, 0, 0);
 
   for I := 0 to Pages.PageCount - 1 do
     Pages.Pages[I].TabVisible := false;
@@ -1362,18 +1464,18 @@ begin
   try
     with Control as TListBox, Canvas do begin
       if Enabled and (odSelected in State) then begin
-        Brush.Color := clHighlight;
-        Font.Color := clHighlightText;
+        Brush.Color := StyleSysColor(clHighlight);
+        Font.Color := StyleSysColor(clHighlightText);
         GradientFillCanvas(Canvas, clHighlight2, clHighlight1, Rect, gdVertical);
       end
       else if (odSelected in State) then begin
-        Brush.Color := cl3DDkShadow;
-        Font.Color := cl3DLight;
+        Brush.Color := StyleSysColor(cl3DDkShadow);
+        Font.Color := StyleSysColor(cl3DLight);
         GradientFillCanvas(Canvas, clDisabled2, clDisabled1, Rect, gdVertical);
       end
       else begin
-        Brush.Color := clWindow;
-        Font.Color := clWindowText;
+        Brush.Color := StyleSysColor(clWindow);
+        Font.Color := StyleSysColor(clWindowText);
         FillRect(Rect);
       end;
 

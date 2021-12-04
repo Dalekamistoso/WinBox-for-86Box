@@ -24,7 +24,9 @@ uses
   frmWizardHDD in 'frmWizardHDD.pas' {WizardHDD},
   frmWizardVM in 'frmWizardVM.pas' {WizardVM},
   frmSplash in 'frmSplash.pas' {WinBoxSplash},
-  dmWinBoxUpd in 'dmWinBoxUpd.pas' {WinBoxUpd: TDataModule};
+  dmWinBoxUpd in 'dmWinBoxUpd.pas' {WinBoxUpd: TDataModule},
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 {$R '..\Data\rcWinBox.RES'}

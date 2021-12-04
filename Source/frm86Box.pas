@@ -25,7 +25,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Buttons,
-  ComCtrls, ExtCtrls, StdCtrls, u86Box, uPicturePager, uFolderMon, uLang;
+  ComCtrls, ExtCtrls, StdCtrls, Themes, u86Box, uPicturePager, uFolderMon,
+  uLang;
 
 type
   TCategoryPanel =  class(ExtCtrls.TCategoryPanel)
@@ -119,10 +120,13 @@ type
   private
     DirectoryChange: string;
     DirectoryChgType: Cardinal;
+  protected
+    procedure CMStyleChanged(var Msg: TMessage); message CM_STYLECHANGED;
   public
     PicturePager: TPicturePager;
     FolderMonitor: TFolderMonitor;
     SideRatio: single;
+    IsColorsAllowed: boolean;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -154,6 +158,8 @@ const
 var
   dbgLogFolderChanges: boolean = false;
 
+function StyleSysColor(const Color: TColor): TColor; inline;
+
 implementation
 
 uses uCommUtil, uCommText, frmMainForm, ShellAPI, Rtti;
@@ -162,6 +168,43 @@ resourcestring
   StrWorkDirRemoved = 'WinBox.WorkDirRemoved';
 
 {$R *.dfm}
+
+procedure StyleFixHiddenEdits(Control: TWinControl;
+  const AllLevels, ToSystemStyle: boolean);
+var
+  I: Integer;
+begin
+  if Assigned(Control) then
+    for I := 0 to Control.ControlCount - 1 do begin
+      if Control.Controls[I] is TEdit then
+        with Control.Controls[I] as TEdit do
+          if BorderStyle = bsNone then begin
+            StyleElements := [];
+
+            if ToSystemStyle then begin
+              ParentColor := true;
+              ParentFont := true;
+            end
+            else begin
+              Color := StyleSysColor(clBtnFace);
+              Font.Color :=
+                TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+              //StyleSysColor(clWindowText);
+            end;
+          end;
+
+      if AllLevels and (Control.Controls[I] is TWinControl) and
+         ((Control.Controls[I] as TWinControl).ControlCount > 0) then
+           StyleFixHiddenEdits(Control.Controls[I] as TWinControl,
+             AllLevels, ToSystemStyle);
+    end;
+end;
+
+function StyleSysColor(const Color: TColor): TColor; inline;
+begin
+  Result := TStyleManager.ActiveStyle.GetSystemColor(Color);
+end;
+
 
 { Tfrm86Box }
 
@@ -204,6 +247,28 @@ begin
     end;
 end;
 
+procedure TFrame86Box.CMStyleChanged(var Msg: TMessage);
+var
+  IsSystemStyle: boolean;
+begin
+  IsSystemStyle := StyleServices.IsSystemStyle;
+  IsColorsAllowed := GetColorsAllowed;
+  StyleFixHiddenEdits(cgPanels, true, IsSystemStyle);
+
+  if IsSystemStyle then begin
+    Color := clWindow;
+    Font.Color := clWindowText;
+  end
+  else begin
+    Color := StyleSysColor(clBtnFace);
+    Font.Color :=
+      TStyleManager.ActiveStyle.GetStyleFontColor(sfTextLabelNormal);
+  end;
+
+  edState.ParentColor := true;
+  edState.Font.Color := Font.Color;
+end;
+
 constructor TFrame86Box.Create(AOwner: TComponent);
 begin
   inherited;
@@ -230,6 +295,8 @@ begin
     OnContextPopup := PicturePagerContextPopup;
     OnClick := PicturePagerClick;
   end;
+
+  Perform(CM_STYLECHANGED, 0, 0);
 
   FolderMonitor := TFolderMonitor.Create(nil);
   FolderMonitor.OnChange := OnDirectoryChange;
@@ -380,6 +447,9 @@ procedure TFrame86Box.UpdateColor(const Profile: T86BoxProfile);
 var
   Success: boolean;
 begin
+  if not IsColorsAllowed then
+    exit;
+
   Success := LockWindowUpdate(Handle);
   try
     if Assigned(Profile) then

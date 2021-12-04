@@ -2,7 +2,7 @@
 
     WinBox Reloaded R2 - An universal GUI for many emulators
 
-    Copyright (C) 2020, Laci b·'
+    Copyright (C) 2020, Laci b√°'
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,16 +96,23 @@ function _P(const Key: string; const Args: array of const): PChar; overload;
 function TryLoadLocale(var Locale: string; out NewBiDi: boolean): TLanguage;
 function GetAvailLangs: TStringList;
 
-procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt; Value: boolean);
-procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean); inline;
-procedure SetListViewBiDi(const Handle: HWND; const Value: boolean);
-procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean); inline;
-procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; const Value: boolean);
+procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt;
+   Value: boolean; const Forced: boolean = false);
+procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean;
+   const Forced: boolean = false); inline;
+procedure SetListViewBiDi(const Handle: HWND; const Value: boolean;
+   const Forced: boolean = false);
+procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean;
+   const Forced: boolean = false); inline;
+procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; 
+   const Value: boolean; const Forced: boolean = false);
 
 //Source: http://archives.miloush.net/michkap/archive/2006/03/03/542963.html
 function GetLocaleIsBiDi(const Locale: string): boolean;
 
 implementation
+
+uses Themes;
 
 resourcestring
   StrStrings = 'Strings';
@@ -286,11 +293,14 @@ begin
 end;
 //---
 
-procedure SetWindowExStyle(const Handle: HWND;
-  const Flag: NativeInt; Value: boolean);
+procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt; 
+  Value: boolean; const Forced: boolean);
 var
   ExStyle: NativeInt;
 begin
+  if not (Forced or StyleServices.IsSystemStyle) then
+    exit;
+
   ExStyle := GetWindowLongPtr(Handle, GWL_EXSTYLE);
 
   if Value then
@@ -302,23 +312,24 @@ begin
   InvalidateRect(Handle, nil, true);
 end;
 
-procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean);
+procedure SetCommCtrlBiDi(const Handle: HWND; const Value, Forced: boolean);
 begin
-  SetWindowExStyle(Handle, WS_EX_LAYOUTRTL, Value);
+  SetWindowExStyle(Handle, WS_EX_LAYOUTRTL, Value, Forced);
 end;
 
-procedure SetListViewBiDi(const Handle: HWND; const Value: boolean);
+procedure SetListViewBiDi(const Handle: HWND; const Value, Forced: boolean);
 begin
   SetCommCtrlBiDi(ListView_GetHeader(Handle), Value);
   SetCommCtrlBiDi(Handle, Value);
 end;
 
-procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean);
+procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft, Forced: boolean);
 begin
   SetWindowExStyle(Handle, WS_EX_LEFTSCROLLBAR, ToLeft);
 end;
 
-procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; const Value: boolean);
+procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; 
+  const Value, Forced: boolean);
 var
   Success: boolean;
   Panel: TCategoryPanel;
@@ -328,12 +339,12 @@ begin
   with Group do
     for I := 0 to Panels.Count - 1 do begin
       Panel := TObject(Panels[I]) as TCategoryPanel;
-      SetCommCtrlBiDi(Panel.Handle, LocaleIsBiDi);
+      SetCommCtrlBiDi(Panel.Handle, LocaleIsBiDi, Forced);
 
       Surface := Panel.Controls[0] as TCategoryPanelSurface;
       Success := LockWindowUpdate(Surface.Handle);
       try
-        SetCommCtrlBiDi(Surface.Handle, LocaleIsBiDi);
+        SetCommCtrlBiDi(Surface.Handle, LocaleIsBiDi, Forced);
       finally
         if Success then begin
           LockWindowUpdate(0);
@@ -415,7 +426,7 @@ begin
             inc(I, 1);
             break;
           end;
-      inc(I, 1); //ha nem t·mogatott karakter.. lÈpjen tov·bb
+      inc(I, 1); //ha nem t√°mogatott karakter.. l√©pjen tov√°bb
       continue;
     end
     else
