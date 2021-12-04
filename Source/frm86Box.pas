@@ -126,6 +126,7 @@ type
     PicturePager: TPicturePager;
     FolderMonitor: TFolderMonitor;
     SideRatio: single;
+    IsColorsAllowed: boolean;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -251,6 +252,7 @@ var
   IsSystemStyle: boolean;
 begin
   IsSystemStyle := StyleServices.IsSystemStyle;
+  IsColorsAllowed := GetColorsAllowed;
   StyleFixHiddenEdits(cgPanels, true, IsSystemStyle);
 
   if IsSystemStyle then begin
@@ -466,7 +468,7 @@ procedure TFrame86Box.UpdateColor(const Profile: T86BoxProfile);
 var
   Success: boolean;
 begin
-  if not StyleServices.IsSystemStyle then
+  if not IsColorsAllowed then
     exit;
 
   Success := LockWindowUpdate(Handle);

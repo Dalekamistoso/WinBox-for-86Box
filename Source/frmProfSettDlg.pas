@@ -271,7 +271,7 @@ begin
         rcColor.Brush.Style := bsSolid;
       end;
 
-      rcColor.Enabled := StyleServices.IsSystemStyle;
+      rcColor.Enabled := GetColorsAllowed;
       if (not rcColor.Enabled) and (rcColor.Brush.Style <> bsClear) then
         rcColor.Brush.Style := bsDiagCross;
 

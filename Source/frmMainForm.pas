@@ -340,6 +340,7 @@ type
     acWinBoxUpdate: TAction;
     Programfrisstsekkeresse1: TMenuItem;
     ComboBox1: TComboBox;
+    pnTop: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure acDebugExecute(Sender: TObject);
@@ -390,7 +391,7 @@ type
     clDisabled1, clDisabled2: TColor;
 
     SideRatio: single;
-    IsSystemStyle: boolean;
+    IsSystemStyle, IsColorsAllowed: boolean;
 
     procedure ResetChart(Chart: TChart);
     procedure AddSeries(Chart: TChart; AColor: TColor; const FriendlyName: string);
@@ -878,7 +879,7 @@ begin
           //-1:  Enabled := State = PROFILE_STATE_STOPPED;
           -2:  Enabled := State = PROFILE_STATE_RUNNING;
           -6:  Enabled := State <> 0;
-          -7, -8: Enabled := IsSystemStyle;
+          -7, -8: Enabled := IsColorsAllowed;
           -127: Enabled := State = 0;
           else if Tag >= 0 then
             Enabled := CanState(Tag)
@@ -1055,6 +1056,7 @@ const
 
 begin
   IsSystemStyle := StyleServices.IsSystemStyle;
+  IsColorsAllowed := GetColorsAllowed;
 
   clHighlight1 := StyleSysColor(clHighlight);
   ColorRGBToHLS(clHighlight1, H, L, S);
@@ -1190,6 +1192,7 @@ end;
 procedure TWinBoxMain.FlipBiDi;
 begin
   SetCommCtrlBiDi(Handle, LocaleIsBiDi);
+  SetCommCtrlBiDi(pnTop.Handle, LocaleIsBiDi);
 
   HomeMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
   PerfMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
@@ -1282,8 +1285,6 @@ begin
   HalfCharHeight := Canvas.TextHeight('W');
   BorderThickness := (List.ItemHeight - ListImages.Height) div 2;
 
-  Perform(CM_STYLECHANGED, 0, 0);
-
   for I := 0 to Pages.PageCount - 1 do
     Pages.Pages[I].TabVisible := false;
   Pages.ActivePageIndex := 0;
@@ -1317,6 +1318,8 @@ begin
   MissingDiskDlg.Caption := Application.Title;
 
   Updater := TUpdaterDlg.Create(nil);
+
+  Perform(CM_STYLECHANGED, 0, 0);
 
   //Internal part
   FirstUpdateDone := false;

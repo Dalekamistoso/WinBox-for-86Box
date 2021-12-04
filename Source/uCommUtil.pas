@@ -123,6 +123,7 @@ procedure TryLoadList(Stream: TStream; List: TStrings; const Origin: int64 = 0);
 //színek a háttérszín alapján
 function GetTextColor(const Color: TColor): TColor;
 function GetLinkColor(Color: TColor): TColor;
+function GetColorsAllowed: boolean;
 
 //közös UI kód, a 86Box Manager elérési útjának bekérérésére
 function AskFor86MgrPath(var ProgramRoot: string): boolean;
@@ -305,6 +306,11 @@ begin
     else
        Result := clBlack;
   end;
+end;
+
+function GetColorsAllowed: boolean;
+begin
+  Result := StyleServices.IsSystemStyle and not LocaleIsBiDi;
 end;
 
 procedure ColorProgress(const Control: TProgressBar); inline;
