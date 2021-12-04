@@ -2,7 +2,7 @@
 
     WinBox Reloaded R2 - An universal GUI for many emulators
 
-    Copyright (C) 2020, Laci b·'
+    Copyright (C) 2020, Laci b√°'
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,13 +97,15 @@ function TryLoadLocale(var Locale: string; out NewBiDi: boolean): TLanguage;
 function GetAvailLangs: TStringList;
 
 procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt;
-   Value: boolean; Forced: boolean = false);
+   Value: boolean; const Forced: boolean = false);
 procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean;
    const Forced: boolean = false); inline;
 procedure SetListViewBiDi(const Handle: HWND; const Value: boolean;
    const Forced: boolean = false);
 procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean;
    const Forced: boolean = false); inline;
+procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; 
+   const Value: boolean; const Forced: boolean = false);
 
 //Source: http://archives.miloush.net/michkap/archive/2006/03/03/542963.html
 function GetLocaleIsBiDi(const Locale: string): boolean;
@@ -291,8 +293,8 @@ begin
 end;
 //---
 
-procedure SetWindowExStyle(const Handle: HWND;
-  const Flag: NativeInt; Value, Forced: boolean);
+procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt; 
+  Value: boolean; const Forced: boolean);
 var
   ExStyle: NativeInt;
 begin
@@ -324,6 +326,32 @@ end;
 procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft, Forced: boolean);
 begin
   SetWindowExStyle(Handle, WS_EX_LEFTSCROLLBAR, ToLeft);
+end;
+
+procedure SetCatPanelsBiDi(const Group: TCategoryPanelGroup; 
+  const Value, Forced: boolean);
+var
+  Success: boolean;
+  Panel: TCategoryPanel;
+  Surface: TCategoryPanelSurface;
+  I: Integer;
+begin
+  with Group do
+    for I := 0 to Panels.Count - 1 do begin
+      Panel := TObject(Panels[I]) as TCategoryPanel;
+      SetCommCtrlBiDi(Panel.Handle, LocaleIsBiDi, Forced);
+
+      Surface := Panel.Controls[0] as TCategoryPanelSurface;
+      Success := LockWindowUpdate(Surface.Handle);
+      try
+        SetCommCtrlBiDi(Surface.Handle, LocaleIsBiDi, Forced);
+      finally
+        if Success then begin
+          LockWindowUpdate(0);
+          Invalidate;
+        end;
+      end;
+    end;
 end;
 
 function GetAvailLangs: TStringList;
@@ -398,7 +426,7 @@ begin
             inc(I, 1);
             break;
           end;
-      inc(I, 1); //ha nem t·mogatott karakter.. lÈpjen tov·bb
+      inc(I, 1); //ha nem t√°mogatott karakter.. l√©pjen tov√°bb
       continue;
     end
     else
