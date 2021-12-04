@@ -28,6 +28,8 @@ object ProfSettDlg: TProfSettDlg
     Caption = '&M'#233'gse'
     ModalResult = 2
     TabOrder = 2
+    ExplicitLeft = 349
+    ExplicitTop = 477
   end
   object btnOK: TButton
     Left = 272
@@ -38,6 +40,8 @@ object ProfSettDlg: TProfSettDlg
     Caption = '&OK'
     TabOrder = 1
     OnClick = btnOKClick
+    ExplicitLeft = 268
+    ExplicitTop = 477
   end
   object pcPages: TPageControl
     Left = 8
@@ -47,6 +51,8 @@ object ProfSettDlg: TProfSettDlg
     ActivePage = tabEmulator
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitWidth = 436
+    ExplicitHeight = 457
     object tabGeneral: TTabSheet
       Caption = #193'ltal'#225'nos'
       DesignSize = (
@@ -277,6 +283,7 @@ object ProfSettDlg: TProfSettDlg
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Emul'#225'tor'
         TabOrder = 0
+        ExplicitWidth = 394
         DesignSize = (
           398
           241)
@@ -335,6 +342,7 @@ object ProfSettDlg: TProfSettDlg
           ScrollBars = ssVertical
           TabOrder = 4
           WantReturns = False
+          ExplicitWidth = 345
         end
         object ed86Box: TEdit
           Left = 24

@@ -1190,9 +1190,32 @@ begin
 end;
 
 procedure TWinBoxMain.FlipBiDi;
+
+  procedure ReorderMenu(const Menu: TMenuItem);
+  var
+    I: Integer;
+  begin
+    for I := 0 to Menu.Count - 1 do
+      Menu.Items[I].MenuIndex := -1;
+
+    for I := 0 to Menu.Count - 1 do
+      Menu.Items[I].MenuIndex := Menu.Count - (I + 1);
+  end;
+
 begin
-  SetCommCtrlBiDi(Handle, LocaleIsBiDi);
-  SetCommCtrlBiDi(pnTop.Handle, LocaleIsBiDi);
+  if IsSystemStyle then begin
+    SetCommCtrlBiDi(Handle, LocaleIsBiDi);
+    Tag := 0;
+  end
+  else if LocaleIsBiDi then begin
+    FlipChildren(false);
+    Tag := 1;
+
+    MainMenu.BiDiMode := bdRightToLeft;
+    ReorderMenu(MainMenu.Items);
+  end;
+
+  SetCommCtrlBiDi(pnTop.Handle, LocaleIsBiDi, true);
 
   HomeMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
   PerfMenu.BiDiMode := BiDiModes[LocaleIsBiDi];
@@ -1233,15 +1256,15 @@ begin
     DeleteDialog.Flags := DeleteDialog.Flags - [tfRtlLayout];
   end;
 
-  SetCommCtrlBiDi(tabHome.Handle, LocaleIsBiDi);
+  SetCommCtrlBiDi(tabHome.Handle, LocaleIsBiDi, true);
   SetCommCtrlBiDi(tabPerfMon.Handle, LocaleIsBiDi);
 
   SetCommCtrlBiDi(tabCPU.Handle, false);
   SetCommCtrlBiDi(tabRAM.Handle, false);
   SetCommCtrlBiDi(tabVMs.Handle, false);
 
-  SetCommCtrlBiDi(tbGlobal.Handle, LocaleIsBiDi);
-  SetCommCtrlBiDi(tbVMs.Handle, LocaleIsBiDi);
+  SetCommCtrlBiDi(tbGlobal.Handle, LocaleIsBiDi, true);
+  SetCommCtrlBiDi(tbVMs.Handle, LocaleIsBiDi, true);
 
   Frame86Box.FlipBiDi;
 end;
@@ -1285,6 +1308,8 @@ begin
   HalfCharHeight := Canvas.TextHeight('W');
   BorderThickness := (List.ItemHeight - ListImages.Height) div 2;
 
+  Perform(CM_STYLECHANGED, 0, 0);
+
   for I := 0 to Pages.PageCount - 1 do
     Pages.Pages[I].TabVisible := false;
   Pages.ActivePageIndex := 0;
@@ -1318,8 +1343,6 @@ begin
   MissingDiskDlg.Caption := Application.Title;
 
   Updater := TUpdaterDlg.Create(nil);
-
-  Perform(CM_STYLECHANGED, 0, 0);
 
   //Internal part
   FirstUpdateDone := false;

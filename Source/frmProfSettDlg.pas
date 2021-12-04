@@ -109,7 +109,7 @@ implementation
 
 {$R *.dfm}
 
-uses uCommUtil, uCommText, frmMainForm, Themes;
+uses uCommUtil, uCommText, frmMainForm;
 
 resourcestring
   AskVmIconDel = '.AskVmIconDel';

@@ -23,26 +23,28 @@ object ProgSettDlg: TProgSettDlg
   object pcPages: TPageControl
     Left = 8
     Top = 8
-    Width = 444
+    Width = 440
     Height = 458
     ActivePage = tabTools
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitWidth = 436
+    ExplicitHeight = 457
     object tabGeneral: TTabSheet
       Caption = #193'ltal'#225'nos'
       DesignSize = (
-        436
+        432
         430)
       object grpDefaultPath: TGroupBox
         Left = 16
         Top = 16
-        Width = 401
+        Width = 397
         Height = 241
         Anchors = [akLeft, akTop, akRight]
         Caption = #218'j virtu'#225'lis g'#233'pek helye'
         TabOrder = 0
         DesignSize = (
-          401
+          397
           241)
         object imgNewVM: TImage
           Left = 16
@@ -54,7 +56,7 @@ object ProgSettDlg: TProgSettDlg
         object lbDefaultPath: TLabel
           Left = 58
           Top = 24
-          Width = 318
+          Width = 314
           Height = 42
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
@@ -62,6 +64,7 @@ object ProgSettDlg: TProgSettDlg
             'Itt megadhatja hogy az '#250'j virtu'#225'lis g'#233'pek a sz'#225'm'#237't'#243'g'#233'pen melyik ' +
             'meghajt'#243'n, '#233's milyen k'#246'nyt'#225'rban ker'#252'ljenek kialak'#237't'#225'sra.'
           WordWrap = True
+          ExplicitWidth = 318
         end
         object lbPath: TLabel
           Left = 24
@@ -157,7 +160,7 @@ object ProgSettDlg: TProgSettDlg
       object grpBehavior: TGroupBox
         Left = 16
         Top = 263
-        Width = 401
+        Width = 397
         Height = 154
         Anchors = [akLeft, akTop, akRight]
         Caption = 'A WinBox viselked'#233'se'
@@ -251,16 +254,17 @@ object ProgSettDlg: TProgSettDlg
       Caption = 'Emul'#225'tor'
       ImageIndex = 3
       DesignSize = (
-        436
+        432
         430)
       object grpDefEmulator: TGroupBox
         Left = 18
         Top = 16
-        Width = 402
+        Width = 398
         Height = 193
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Alap'#233'rtelmezett emul'#225'tor'
         TabOrder = 0
+        ExplicitWidth = 402
         object imgEmulator: TImage
           Left = 16
           Top = 24
@@ -354,13 +358,13 @@ object ProgSettDlg: TProgSettDlg
       object grpAutoUpdate: TGroupBox
         Left = 18
         Top = 215
-        Width = 402
+        Width = 398
         Height = 202
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Automatikus friss'#237't'#233's'
         TabOrder = 1
         DesignSize = (
-          402
+          398
           202)
         object lbArtifact: TLabel
           Left = 23
@@ -374,32 +378,35 @@ object ProgSettDlg: TProgSettDlg
         object cbAutoUpdate: TCheckBox
           Left = 18
           Top = 149
-          Width = 300
+          Width = 296
           Height = 17
           Anchors = [akLeft, akRight, akBottom]
           Caption = 'Emul'#225'tor friss'#237't'#233'sek keres'#233'se &automatikusan'
           Checked = True
           State = cbChecked
           TabOrder = 1
+          ExplicitWidth = 300
         end
         object cbGetSource: TCheckBox
           Left = 18
           Top = 170
-          Width = 265
+          Width = 261
           Height = 17
           Anchors = [akLeft, akRight, akBottom]
           Caption = '&Forr'#225'sk'#243'd let'#246'lt'#233'se, ha lehets'#233'ges'
           TabOrder = 2
+          ExplicitWidth = 265
         end
         object edArtifact: TEdit
           Left = 24
           Top = 48
-          Width = 353
+          Width = 349
           Height = 21
           Anchors = [akLeft, akTop, akRight, akBottom]
           TabOrder = 0
           Text = 'https://ci.86box.net/job/86Box'
           OnChange = edArtifactChange
+          ExplicitWidth = 353
         end
         object tvArtifact: TTreeView
           Left = 23
@@ -457,12 +464,12 @@ object ProgSettDlg: TProgSettDlg
       Caption = 'Megjelen'#233's'
       ImageIndex = 1
       DesignSize = (
-        436
+        432
         430)
       object grpAppearance: TGroupBox
         Left = 18
         Top = 16
-        Width = 402
+        Width = 398
         Height = 400
         Anchors = [akLeft, akTop, akRight]
         Caption = #218'j g'#233'pek megjelen'#233'se'
@@ -537,7 +544,7 @@ object ProgSettDlg: TProgSettDlg
           Top = 143
           Width = 337
           Height = 58
-          ItemHeight = 13
+          ItemHeight = 17
           Items.Strings = (
             'R'#246'gz'#237'tett 4:3 k'#233'par'#225'ny megtart'#225'sa'
             'T'#250'lp'#225'szt'#225'z'#225's enged'#233'lyez'#233'se (mint EGA/VGA)'
@@ -1133,7 +1140,7 @@ object ProgSettDlg: TProgSettDlg
     end
   end
   object btnOK: TButton
-    Left = 276
+    Left = 272
     Top = 476
     Width = 75
     Height = 25
@@ -1141,9 +1148,11 @@ object ProgSettDlg: TProgSettDlg
     Caption = '&OK'
     TabOrder = 2
     OnClick = btnOKClick
+    ExplicitLeft = 268
+    ExplicitTop = 475
   end
   object btnCancel: TButton
-    Left = 357
+    Left = 353
     Top = 476
     Width = 75
     Height = 25
@@ -1151,6 +1160,8 @@ object ProgSettDlg: TProgSettDlg
     Caption = '&M'#233'gse'
     ModalResult = 2
     TabOrder = 3
+    ExplicitLeft = 349
+    ExplicitTop = 475
   end
   object btnImport: TButton
     Left = 28
@@ -1161,6 +1172,7 @@ object ProgSettDlg: TProgSettDlg
     Caption = '&Import'#225'l'#225's '#9660
     TabOrder = 1
     OnClick = btnImportClick
+    ExplicitTop = 475
   end
   object pmImport: TPopupMenu
     Left = 144

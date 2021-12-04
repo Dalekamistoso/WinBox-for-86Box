@@ -96,15 +96,21 @@ function _P(const Key: string; const Args: array of const): PChar; overload;
 function TryLoadLocale(var Locale: string; out NewBiDi: boolean): TLanguage;
 function GetAvailLangs: TStringList;
 
-procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt; Value: boolean);
-procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean); inline;
-procedure SetListViewBiDi(const Handle: HWND; const Value: boolean);
-procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean); inline;
+procedure SetWindowExStyle(const Handle: HWND; const Flag: NativeInt;
+   Value: boolean; Forced: boolean = false);
+procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean;
+   const Forced: boolean = false); inline;
+procedure SetListViewBiDi(const Handle: HWND; const Value: boolean;
+   const Forced: boolean = false);
+procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean;
+   const Forced: boolean = false); inline;
 
 //Source: http://archives.miloush.net/michkap/archive/2006/03/03/542963.html
 function GetLocaleIsBiDi(const Locale: string): boolean;
 
 implementation
+
+uses Themes;
 
 resourcestring
   StrStrings = 'Strings';
@@ -286,10 +292,13 @@ end;
 //---
 
 procedure SetWindowExStyle(const Handle: HWND;
-  const Flag: NativeInt; Value: boolean);
+  const Flag: NativeInt; Value, Forced: boolean);
 var
   ExStyle: NativeInt;
 begin
+  if not (Forced or StyleServices.IsSystemStyle) then
+    exit;
+
   ExStyle := GetWindowLongPtr(Handle, GWL_EXSTYLE);
 
   if Value then
@@ -301,18 +310,18 @@ begin
   InvalidateRect(Handle, nil, true);
 end;
 
-procedure SetCommCtrlBiDi(const Handle: HWND; const Value: boolean);
+procedure SetCommCtrlBiDi(const Handle: HWND; const Value, Forced: boolean);
 begin
-  SetWindowExStyle(Handle, WS_EX_LAYOUTRTL, Value);
+  SetWindowExStyle(Handle, WS_EX_LAYOUTRTL, Value, Forced);
 end;
 
-procedure SetListViewBiDi(const Handle: HWND; const Value: boolean);
+procedure SetListViewBiDi(const Handle: HWND; const Value, Forced: boolean);
 begin
   SetCommCtrlBiDi(ListView_GetHeader(Handle), Value);
   SetCommCtrlBiDi(Handle, Value);
 end;
 
-procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft: boolean);
+procedure SetScrollBarBiDi(const Handle: HWND; const ToLeft, Forced: boolean);
 begin
   SetWindowExStyle(Handle, WS_EX_LEFTSCROLLBAR, ToLeft);
 end;
